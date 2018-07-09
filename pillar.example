@@ -1,0 +1,10 @@
+filesystems:
+  /dev/sdb1:
+    mountpoint: /opt
+
+    # These settings are the defaults
+    fstype: ext4
+    options: noatime,nobarrier
+    persist: true
+
+# Supported fstypes: btrfs, xfs, ext2, ext3, ext4
