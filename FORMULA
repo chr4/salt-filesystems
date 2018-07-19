@@ -1,0 +1,7 @@
+name: filesystems
+os: Debian, Ubuntu
+os_family: Debian
+version: 201802
+release: 1
+summary: Formula for preparing and mounting filesystems
+description: Formula for preparing and mounting filesystems
