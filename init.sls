@@ -1,5 +1,3 @@
-{% set device = '/dev/sdb' %}
-
 {% for device, config in pillar['filesystems'].items() %}
 
 {% set fstype = config['fstype']|default('ext4') %}
@@ -7,7 +5,7 @@
 {% set options = config['options']|default('noatime,nobarrier') %}
 
 # Install filesystem tools
-filesystem_tools:
+filesystem-tools-{{ device }}:
   pkg.installed:
 {% if fstype == 'xfs' %}
     - pkgs: [xfsprogs]
@@ -23,27 +21,28 @@ mkfs.xfs {{ device }}:
   cmd.run:
     - unless: file -s $(readlink -f {{ device }}) |grep -q XFS
     - require:
-      - pkg: filesystem_tools
+      - pkg: filesystem-tools-{{ device }}
 
 {% elif fstype == 'btrfs' %}
 mkfs.btrfs {{ device }}:
   cmd.run:
     - unless: file -s $(readlink -f {{ device }}) |grep -q BTRFS
     - require:
-      - pkg: filesystem_tools
+      - pkg: filesystem-tools-{{ device }}
 
 {% elif 'ext' in fstype %}
 mkfs.ext4 {{ device }}:
   cmd.run:
     - unless: file -s $(readlink -f {{ device }}) |grep -q ext4
     - require:
-      - pkg: filesystem_tools
+      - pkg: filesystem-tools-{{ device }}
 {% endif %}
 
 # Mount filesystem if mountpoint is given
 {% if config['mountpoint'] is defined %}
-/var/lib/postgresql:
+mount-{{ device }}:
   mount.mounted:
+    - name: {{ config['mountpoint'] }}
     - device: {{ device }}
     - fstype: {{ fstype }}
     - mkmnt: true
