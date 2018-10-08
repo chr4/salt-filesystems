@@ -1,4 +1,4 @@
-{% for device, config in pillar['filesystems'].items() %}
+{% for device, config in pillar['filesystems']|dictsort %}
 
 {% set fstype = config['fstype']|default('ext4') %}
 {% set persist = config['persist']|default(true) %}
