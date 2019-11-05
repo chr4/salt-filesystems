@@ -3,6 +3,9 @@
 {% set fstype = config['fstype']|default('ext4') %}
 {% set persist = config['persist']|default(true) %}
 {% set options = config['options']|default('noatime,nobarrier') %}
+{% set dump = config['dump']|default('0') %}
+{% set pass_num = config['pass_num']|default('0') %}
+
 
 # Install filesystem tools
 filesystem-tools-{{ device }}:
@@ -45,6 +48,8 @@ mount-{{ device }}:
     - name: {{ config['mountpoint'] }}
     - device: {{ device }}
     - fstype: {{ fstype }}
+    - dump: {{ dump }}
+    - pass_num: {{ pass_num }}
     - mkmnt: true
     - persist: {{ persist }}
     - opts: {{ options }}
