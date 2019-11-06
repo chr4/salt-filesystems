@@ -4,7 +4,7 @@
 {% set persist = config['persist']|default(true) %}
 {% set options = config['options']|default('noatime,nobarrier') %}
 {% set dump = config['dump']|default('0') %}
-{% set pass_num = config['pass_num']|default('0') %}
+{% set pass_num = config['pass_num']|default('2') %}
 
 
 # Install filesystem tools

@@ -7,6 +7,6 @@ filesystems:
     options: noatime,nobarrier
     persist: true
     dump: 0
-    pass_num: 0
+    pass_num: 2
 
 # Supported fstypes: btrfs, xfs, ext2, ext3, ext4
