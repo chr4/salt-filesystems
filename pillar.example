@@ -10,3 +10,12 @@ filesystems:
     pass_num: 2
 
 # Supported fstypes: btrfs, xfs, ext2, ext3, ext4
+
+# Instead of a device name you can also use UUIDs or LABELs
+filesystems:
+  UUID=xxx-xxx-xxx-xxx:
+    mountpoint: /opt
+
+filesystems:
+  LABEL=root:
+    mountpoint: /opt

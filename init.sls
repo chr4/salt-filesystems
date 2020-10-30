@@ -6,6 +6,14 @@
 {% set dump = config['dump']|default('0') %}
 {% set pass_num = config['pass_num']|default('2') %}
 
+# Parse UUID/LABEL from device and use /dev/disk/by-uuid for mkfs
+{% if device.startswith('UUID=') %}
+{% set blkdev = '/dev/disk/by-uuid/' + device.split('=') | last %}
+{% elif device.startswith('LABEL=') %}
+{% set blkdev = '/dev/disk/by-label/' + device.split('=') | last %}
+{% else %}
+{% set blkdev = device %}
+{% endif %}
 
 # Install filesystem tools
 filesystem-tools-{{ device }}:
@@ -13,30 +21,30 @@ filesystem-tools-{{ device }}:
 {% if fstype == 'xfs' %}
     - pkgs: [xfsprogs]
 {% elif fstype == 'btrfs' %}
-    - pkgs: [btrfs-tools]
+    - pkgs: [btrfs-progs]
 {% elif 'ext' in fstype %}
     - pkgs: [e2fsprogs]
 {% endif %}
 
 # Format unless it already is formatted
 {% if fstype == 'xfs' %}
-mkfs.xfs {{ device }}:
+mkfs.xfs {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ device }}) |grep -q XFS
+    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q XFS
     - require:
       - pkg: filesystem-tools-{{ device }}
 
 {% elif fstype == 'btrfs' %}
-mkfs.btrfs {{ device }}:
+mkfs.btrfs {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ device }}) |grep -q BTRFS
+    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q BTRFS
     - require:
       - pkg: filesystem-tools-{{ device }}
 
 {% elif 'ext' in fstype %}
-mkfs.ext4 {{ device }}:
+mkfs.ext4 {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ device }}) |grep -q ext4
+    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q ext4
     - require:
       - pkg: filesystem-tools-{{ device }}
 {% endif %}
