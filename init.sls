@@ -15,36 +15,37 @@
 {% set blkdev = device %}
 {% endif %}
 
-# Install filesystem tools
+# Install filesystem tools. Make sure file and grep are installed,
+# otherwise the automatic filesystem creation will end up in a desaster
 filesystem-tools-{{ device }}:
   pkg.installed:
 {% if fstype == 'xfs' %}
-    - pkgs: [xfsprogs]
+    - pkgs: [xfsprogs, file, grep]
 {% elif fstype == 'btrfs' %}
-    - pkgs: [btrfs-progs]
+    - pkgs: [btrfs-progs, file, grep]
 {% elif 'ext' in fstype %}
-    - pkgs: [e2fsprogs]
+    - pkgs: [e2fsprogs, file, grep]
 {% endif %}
 
 # Format unless it already is formatted
 {% if fstype == 'xfs' %}
 mkfs.xfs {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q XFS
+    - unless: file -s $(readlink -f {{ blkdev }}) | grep -q XFS
     - require:
       - pkg: filesystem-tools-{{ device }}
 
 {% elif fstype == 'btrfs' %}
 mkfs.btrfs {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q BTRFS
+    - unless: file -s $(readlink -f {{ blkdev }}) | grep -q BTRFS
     - require:
       - pkg: filesystem-tools-{{ device }}
 
 {% elif 'ext' in fstype %}
 mkfs.ext4 {{ blkdev }}:
   cmd.run:
-    - unless: file -s $(readlink -f {{ blkdev }}) |grep -q ext4
+    - unless: file -s $(readlink -f {{ blkdev }}) | grep -q ext4
     - require:
       - pkg: filesystem-tools-{{ device }}
 {% endif %}
